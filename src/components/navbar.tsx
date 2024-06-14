@@ -1,13 +1,5 @@
 import ai from "../assets/image.jpeg";
-import { clearSession } from "../shared/Session";
-import { useNavigate } from "react-router-dom";
-import { IoMdLogOut } from "react-icons/io";
 const Navbar = () => {
-  const navigate = useNavigate();
-  const handleLogout = async () => {
-    clearSession();
-    navigate("/");
-  };
   return (
     <div className="bg-mainColor rounded-bl-xl rounded-br-xl  shadow-md">
       <nav className="container mx-auto z-20 w-full">
