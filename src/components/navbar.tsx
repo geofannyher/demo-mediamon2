@@ -1,4 +1,4 @@
-import ai from "../assets/ai.jpg";
+import ai from "../assets/image.jpeg";
 import { clearSession } from "../shared/Session";
 import { useNavigate } from "react-router-dom";
 import { IoMdLogOut } from "react-icons/io";

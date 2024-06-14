@@ -41,7 +41,7 @@ const ChatPage: React.FC = () => {
     setTimeout(() => {
       setMessages([
         {
-          text: "Silakan kirimkan artikel berita disini, agar bisa segera kami proses",
+          text: "Silakan kirimkan konten media sosial disini, agar bisa segera kami proses.",
           sender: "ai",
         },
       ]);
@@ -71,7 +71,7 @@ const ChatPage: React.FC = () => {
 
     const resNew: any = await chatRes({
       message: messageInput,
-      star: "llama_article",
+      star: "llama_socmed",
       id: idUserSession ? idUserSession : "",
       model: "gpt-4-turbo-preview",
       is_rag: "false",

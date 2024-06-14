@@ -1,5 +1,5 @@
 import { TChatProps } from "../utils/types/chat.type";
-import ai from "../assets/ai.jpg";
+import ai from "../assets/image.jpeg";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useEffect, useState } from "react";
