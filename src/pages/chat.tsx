@@ -8,6 +8,7 @@ import LoadingComponent from "../components/loader";
 import { getIdSession } from "../services/supabase/session.service";
 import { chatRes } from "../services/api/chat.services";
 import notificationSound from "../assets/notif.mp3";
+import { getSession } from "../shared/Session";
 const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<IMessage[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -31,7 +32,7 @@ const ChatPage: React.FC = () => {
   const getIdUser = async () => {
     const resses = await getIdSession();
     if (resses?.status == 200) {
-      setId(resses?.data?.localid);
+      setId(resses?.data?.uuid);
     } else {
       return api.error({ message: "Gagal mendapatkan id user" });
     }
@@ -41,7 +42,7 @@ const ChatPage: React.FC = () => {
     setTimeout(() => {
       setMessages([
         {
-          text: "Silakan kirimkan konten media sosial disini, agar bisa segera kami proses.",
+          text: "Silakan kirimkan konten media sosial disini, agar bisa segera kami proses",
           sender: "ai",
         },
       ]);
@@ -55,11 +56,15 @@ const ChatPage: React.FC = () => {
 
   const handleForm = async (event: any) => {
     event.preventDefault();
+    const idSession = getSession();
+
     const messageInput = event?.target[0]?.value.trim();
     event.target[0].value = "";
-
     if (!messageInput) {
       return api.error({ message: "Kolom pesan tidak boleh kosong" });
+    }
+    if (!idSession) {
+      return api.error({ message: "Model tidak boleh kosong" });
     }
     setIsLoading(true);
     const userMessage = { text: messageInput, sender: "user" };
@@ -71,7 +76,7 @@ const ChatPage: React.FC = () => {
 
     const resNew: any = await chatRes({
       message: messageInput,
-      star: "llama_socmed",
+      star: idSession ? idSession : "",
       id: idUserSession ? idUserSession : "",
       model: "gpt-4-turbo-preview",
       is_rag: "false",
