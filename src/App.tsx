@@ -6,7 +6,6 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* <Route path="*" element={<MaintenancePage />} /> */}
         <Route path="/" element={<MainLayout />}>
           <Route index element={<ChatPage />} />
         </Route>
