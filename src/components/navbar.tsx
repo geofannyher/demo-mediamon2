@@ -4,7 +4,10 @@ import { Form, Select } from "antd";
 import { getSession, saveSession } from "../shared/Session";
 
 const Navbar = () => {
-  const [star, setStar] = useState<string>("llama_article");
+  const [star, setStar] = useState<string>(
+    () => getSession() || "llama_article"
+  );
+
   const { Item } = Form;
 
   useEffect(() => {
@@ -22,6 +25,7 @@ const Navbar = () => {
 
   const handleStarChange = (value: string) => {
     setStar(value);
+    location.reload();
   };
 
   return (
@@ -46,8 +50,7 @@ const Navbar = () => {
               <Item name="model" className="w-full md:w-auto px-2">
                 <Select
                   size="large"
-                  placeholder="select Model"
-                  // defaultValue={star}
+                  defaultValue={star}
                   onChange={handleStarChange}
                   value={star}
                   options={[

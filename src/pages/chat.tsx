@@ -5,16 +5,18 @@ import { IMessage } from "../utils/interface/chat.interface";
 import { AiChat, UserChat } from "../components/chat";
 import Navbar from "../components/navbar";
 import LoadingComponent from "../components/loader";
-import { getIdSession } from "../services/supabase/session.service";
-import { chatRes } from "../services/api/chat.services";
 import notificationSound from "../assets/notif.mp3";
 import { getSession } from "../shared/Session";
+import { generateText } from "ai";
+import { createOpenAI } from "@ai-sdk/openai";
+import { mediaEkstraktor, sosmedEkstraktor } from "../shared/systemData";
+
 const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<IMessage[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [api, context] = notification.useNotification();
   const [isLoading, setIsLoading] = useState(false);
-  const [idUserSession, setId] = useState("");
+  const session = getSession();
 
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
@@ -29,26 +31,30 @@ const ChatPage: React.FC = () => {
     }
   };
 
-  const getIdUser = async () => {
-    const resses = await getIdSession();
-    if (resses?.status == 200) {
-      setId(resses?.data?.uuid);
-    } else {
-      return api.error({ message: "Gagal mendapatkan id user" });
-    }
-  };
+  const openai = createOpenAI({
+    baseURL: import.meta.env.VITE_APP_CHATT,
+    apiKey: import.meta.env.VITE_KEY_CHATT,
+  });
 
   useEffect(() => {
     setTimeout(() => {
-      setMessages([
-        {
-          text: "Silakan kirimkan konten media sosial disini, agar bisa segera kami proses",
-          sender: "ai",
-        },
-      ]);
+      if (session == "llama_article") {
+        setMessages([
+          {
+            text: "Silakan kirimkan artikel berita disini, agar bisa segera kami proses",
+            sender: "ai",
+          },
+        ]);
+      } else {
+        setMessages([
+          {
+            text: "Silakan kirimkan konten media sosial disini, agar bisa segera kami proses.",
+            sender: "ai",
+          },
+        ]);
+      }
     }, 700);
-    getIdUser();
-  }, []);
+  }, [session]);
 
   useEffect(() => {
     scrollToBottom();
@@ -74,19 +80,21 @@ const ChatPage: React.FC = () => {
     const audio = new Audio(notificationSound);
     audio.play();
 
-    const resNew: any = await chatRes({
-      message: messageInput,
-      star: idSession ? idSession : "",
-      id: idUserSession ? idUserSession : "",
-      model: "gpt-4-turbo-preview",
-      is_rag: "false",
+    const model = openai(import.meta.env.VITE_MODEL_CHATT);
+    const system =
+      idSession == "llama_article" ? mediaEkstraktor : sosmedEkstraktor;
+
+    const result = await generateText({
+      model,
+      prompt: messageInput,
+      system,
     });
 
-    if (resNew && resNew?.data?.data) {
+    if (result?.text && result?.text) {
       setMessages((prevMessages: any) => {
         return [
           ...prevMessages.filter((m: any) => !m.isLoading),
-          { text: resNew?.data?.data || "AI tidak merespon", sender: "ai" },
+          { text: result?.text || "AI tidak merespon", sender: "ai" },
         ];
       });
       const audio = new Audio(notificationSound);
