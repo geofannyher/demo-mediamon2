@@ -38,7 +38,7 @@ const Navbar = () => {
                 <div className="relative flex">
                   <img
                     src={ai}
-                    className="h-10 w-10 items-center justify-center rounded-full object-cover"
+                    className="h-10 w-10 text-white items-center justify-center rounded-full object-cover"
                   />
                 </div>
                 <div className="flex flex-col text-white">
