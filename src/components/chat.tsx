@@ -1,21 +1,46 @@
+import { useEffect, useState } from "react";
 import { TChatProps } from "../utils/types/chat.type";
 import ai from "../assets/image.jpeg";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import { useEffect, useState } from "react";
 
 export const AiChat = ({ message }: TChatProps) => {
   const [displayedMessage, setDisplayedMessage] = useState("");
 
   useEffect(() => {
-    if (typeof message !== "string") {
-      return;
+    // Function to check if a string is valid JSON
+    const isValidJSON = (str: string) => {
+      try {
+        JSON.parse(str);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    };
+
+    let finalMessage = message;
+    const jsonStartIndex = message.indexOf(
+      "Here is the extracted information in JSON format:"
+    );
+    if (jsonStartIndex !== -1) {
+      const jsonString = message
+        .substring(
+          jsonStartIndex +
+            "Here is the extracted information in JSON format:".length
+        )
+        .trim();
+
+      if (isValidJSON(jsonString)) {
+        console.log(jsonString, "belum");
+        const objJson = JSON.parse(jsonString);
+        finalMessage = JSON.stringify(objJson, null, 4);
+        console.log(finalMessage, "sudah");
+        setDisplayedMessage(finalMessage);
+      }
     }
     setDisplayedMessage("");
     let currentIndex = 0;
     const interval = setInterval(() => {
-      if (currentIndex <= message.length) {
-        setDisplayedMessage(message.substring(0, currentIndex));
+      if (currentIndex <= finalMessage.length) {
+        setDisplayedMessage(finalMessage.substring(0, currentIndex));
         currentIndex++;
       } else {
         clearInterval(interval);
@@ -32,21 +57,13 @@ export const AiChat = ({ message }: TChatProps) => {
           <img
             src={ai}
             className="h-10 w-10 items-center justify-center rounded-full object-cover"
+            alt="AI Avatar"
           />
           <div
-            style={{ whiteSpace: "pre-line" }}
+            style={{ whiteSpace: "pre-wrap" }}
             className="w-auto max-w-2xl rounded-br-xl rounded-tl-xl overflow-auto rounded-tr-xl bg-chatAi p-4 shadow-sm"
           >
-            <Markdown
-              components={{
-                a: ({ node, ...props }) => (
-                  <a {...props} style={{ color: "blue" }} />
-                ),
-              }}
-              remarkPlugins={[remarkGfm]}
-            >
-              {displayedMessage}
-            </Markdown>
+            {displayedMessage}
           </div>
         </div>
       </div>
